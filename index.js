@@ -5,7 +5,16 @@ const FileStore = require('session-file-store')(session)
 const flash = require('express-flash')
 const app = express()
 const conn = require('./db/conn')
-const { Store } = require('express-session')
+// const { Store } = require('express-session')
+//Models
+const Tought = require('./models/Tought')
+const User = require('./models/User')
+// import Routes
+const toughtsRoutes = require('./routes/toughtsRoutes')
+const authRoutes = require('./routes/authRoutes')
+// const { ppid } = require('process')
+//import controller
+const ToughtsController = require('./controllers/ToughtController')
 //template
 app.engine('handlebars', exphbs.engine())
 app.set('view engine', 'handlebars')
@@ -51,10 +60,15 @@ app.use((req, res, next)=>{
     }
     next()
 })
-
+//Routes
+app.use('/toughts', toughtsRoutes)
+app.use('/', authRoutes)
+app.get('/', ToughtsController.showToughts)
 
 //servidor
-conn.sync().then(()=>{
+conn.sync({
+//    force: true//Forçou a atualização das tabelas do banco após a criação do relacionamento nos models
+}).then(()=>{
     app.listen(3000)
 }).catch((e)=>{
     console.log(e)
