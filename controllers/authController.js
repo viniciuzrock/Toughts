@@ -1,10 +1,43 @@
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')//
-const { EmptyResultError } = require('sequelize')
+const { where } = require('sequelize')
+// const { EmptyResultError } = require('sequelize')
 
 module.exports = class AuthController {
     static login(req, res){
         res.render('auth/login')
+    }
+
+    static async loginPost(req, res){
+
+        const {email, password } = req.body
+        
+        //find user
+        const user = await User.findOne({where: {email: email}})
+        //check e-mail
+        if(!user){
+            req.flash('message','Usuário não encontrado, tente novamente!')
+            res.render('auth/login')
+
+            return
+        }
+        //check password
+        const passwordMatch = bcrypt.compareSync(password, user.password)
+
+        if(!passwordMatch){
+            req.flash('message','Senha inválida, tente novamente!')
+            res.render('auth/login')
+
+            return
+        }
+
+        req.session.userId = user.id 
+
+        req.flash('message','Autenticação realizada com sucesso!')
+        req.session.save(()=>{
+            res.redirect('/')
+        })
+        // res.render('auth/login')
     }
 
     static register(req, res){
@@ -38,9 +71,6 @@ module.exports = class AuthController {
             const salt = bcrypt.genSaltSync(10)
             //encriptação
             const hashedPassword = bcrypt.hashSync(password, salt)
-            console.log('PASSS'+password)
-            console.log('SAALLT'+salt)
-            console.log('HASSSHH'+hashedPassword)
             const user = {
                 name,
                 email,
@@ -52,7 +82,6 @@ module.exports = class AuthController {
                 //inicia sessao
                 req.session.userId = createdUser.id 
 
-
                 req.flash('message','Cadastro realizado com sucesso!')
                 req.session.save(()=>{
                     res.redirect('/')
@@ -63,5 +92,12 @@ module.exports = class AuthController {
         } catch (error) {
                 console.log('ERRO FORM: '+error)
         }
+    }
+
+    static logout(req, res){
+
+        req.session.destroy()
+        res.redirect('/login')
+
     }
 }
