@@ -1,3 +1,48 @@
-<h1>
-    Todos os pensamentos
-</h1>
+<div class="home-header">
+    {{#if search}}
+        <h1>Você está buscando por <span>{{search}}</span></h1>
+        {{#if toughtsQty }}
+            <p>Foram encontrados <span>{{toughtsQty}}</span> pensamentos</p>
+        {{else}}
+            <p>Nenhum pensamento foi encotrado para a busca por <span>{{search}}</section></span></p>
+        {{/if}}
+    {{else}}
+    <h1>Alguns <span>pensamentos</span> abaixo:</h1>
+    {{/if}}
+    <form action="/" method="get">
+        <input type="text" name="search" placeholder="Procurar pensamento">
+        <input type="submit" class="btn" value="Pesquisar">
+    </form>
+    <div class="order-container">
+        <span>Ordernar por:</span>
+        <form action="/" method="get">
+            <input type="hidden" name="search" value="{{this.search}}">
+            <input type="hidden" name="order" value="new">
+            <button type="submit">
+                <i class="bi bi-arrow-up"></i>
+            </button>
+        </form>
+        <form action="/" method="get">
+            <input type="hidden" name="search" value="{{this.search}}">
+            <input type="hidden" name="order" value="old">
+            <button type="submit">
+                <i class="bi bi-arrow-down"></i>
+            </button>
+        </form>
+        <a href="/">Limpar</a>
+    </div>
+</div>
+<div class="toughts-container">
+    {{#each toughts}}
+        <figure>
+            <figure>
+                <blockquote>
+                    "{{this.title}}"
+                </blockquote>
+                <figcaption>por <span>{{this.User.name}}</span></figcaption>
+            </figure>
+        </figure>
+    {{/each}}
+</div>
+        {{!-- Já que os filtros sao formularios, e as requisições deles sao pela URL,
+        Ao limpar a URL os filtros serão removidos --}}

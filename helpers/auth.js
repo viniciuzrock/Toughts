@@ -1,9 +1,9 @@
 module.exports.checkAuth = function(req, res, next ){
  
-    const userId = req.sesion.userId
-
+    const userId = req.session.userId
+    //Protegendo as rotas com autenticação
     if(!userId){
-        res.redirec('/login')
+        res.redirect('/login')
     }
 
     next()
